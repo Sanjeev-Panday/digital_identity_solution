@@ -1,0 +1,48 @@
+version: '3.7'
+
+services:
+  issuer-agent:
+    image: bcgovimages/aries-cloudagent:py36-1.16-0_0.7.3
+    ports:
+      - "8020:8020"    # Agent endpoint
+      - "8031:8031"    # Admin API
+    environment:
+      - ACAPY_ADMIN_API_KEY=${ACAPY_ADMIN_API_KEY_ISSUER}
+    command: >
+      start
+      --admin 0.0.0.0 8031
+      --admin-insecure-mode
+      --admin-api-key ${ACAPY_ADMIN_API_KEY}
+      --inbound-transport http 0.0.0.0 8020
+      --outbound-transport http
+      --genesis-url http://test.bcovrin.vonx.io/genesis
+      --wallet-type askar
+      --wallet-name issuer_wallet
+      --wallet-key issuer_wallet_key
+      --auto-provision
+      --auto-accept-invites
+      --auto-accept-requests
+      --log-level INFO
+
+  verifier-agent:
+    image: bcgovimages/aries-cloudagent:py36-1.16-0_0.7.3
+    ports:
+      - "8021:8020"
+      - "8032:8031"
+    environment:
+      - ACAPY_ADMIN_API_KEY=verifier_admin_api_key
+    command: >
+      start
+      --admin 0.0.0.0 8031
+      --admin-insecure-mode
+      --admin-api-key ${ACAPY_ADMIN_API_KEY}
+      --inbound-transport http 0.0.0.0 8020
+      --outbound-transport http
+      --genesis-url http://test.bcovrin.vonx.io/genesis
+      --wallet-type askar
+      --wallet-name verifier_wallet
+      --wallet-key verifier_wallet_key
+      --auto-provision
+      --auto-accept-invites
+      --auto-accept-requests
+      --log-level INFO
